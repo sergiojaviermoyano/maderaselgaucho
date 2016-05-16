@@ -23,29 +23,28 @@
             </thead>
             <tbody>
               <?php
-                if(count($list) > 0) {                  
+                if($list) {                  
                 	foreach($list as $p)
       		        {
   	                echo '<tr>';
   	                echo '<td>';
                     
                     if (strpos($permission,'Edit') !== false) {
-  	                	echo '<i class="fa fa-fw fa-pencil" style="color: #f39c12; cursor: pointer; margin-left: 15px;" onclick="LoadPro('.$p['id_proveedor'].',\'Edit\')"></i>';
-                      echo '<i class="fa fa-fw fa-files-o" style="color: #3c8dbc; cursor: pointer; margin-left: 15px;" onclick="LoadPol('.$p['id_proveedor'].',\'Edit\')"></i>';
+  	                	echo '<i class="fa fa-fw fa-pencil" style="color: #f39c12; cursor: pointer; margin-left: 15px;" onclick="LoadPro('.$p['prvId'].',\'Edit\')"></i>';
                     }
 
                     if (strpos($permission,'Del') !== false) {
-  	                	echo '<i class="fa fa-fw fa-times-circle" style="color: #dd4b39; cursor: pointer; margin-left: 15px;" onclick="LoadPro('.$p['id_proveedor'].',\'Del\')"></i>';
+  	                	echo '<i class="fa fa-fw fa-times-circle" style="color: #dd4b39; cursor: pointer; margin-left: 15px;" onclick="LoadPro('.$p['prvId'].',\'Del\')"></i>';
                     }
                     
                     if (strpos($permission,'View') !== false) {
-  	                	echo '<i class="fa fa-fw fa-search" style="color: #3c8dbc; cursor: pointer; margin-left: 15px;" onclick="LoadPro('.$p['id_proveedor'].',\'View\')"></i>';
+  	                	echo '<i class="fa fa-fw fa-search" style="color: #3c8dbc; cursor: pointer; margin-left: 15px;" onclick="LoadPro('.$p['prvId'].',\'View\')"></i>';
                     }
 
   	                echo '</td>';
-                    echo '<td style="text-align: left">'.$p['razon_social'].'</td>';
-  	                echo '<td style="text-align: right">'.$p['telefono'].'</td>';
-                    echo '<td style="text-align: left">'.$p['mail'].'</td>';
+                    echo '<td style="text-align: left">'.$p['prvRazonSocial'].'</td>';
+  	                echo '<td style="text-align: right">'.$p['prvTelefono'].'</td>';
+                    echo '<td style="text-align: left">'.$p['prvMail'].'</td>';
   	                echo '</tr>';
                     
       		        }
@@ -123,22 +122,12 @@
   	}
 
   	var hayError = false;
-    if($('#razon_social').val() == '')
+    if($('#prvRazonSocial').val() == '')
     {
     	hayError = true;
     }
 
-    if($('#direccion').val() == '')
-    {
-      hayError = true;
-    }
-
-    if($('#envios').val() == '')
-    {
-      hayError = true;
-    }
-
-    if($('#telefono').val() == '')
+    if($('#prvDocumento').val() == '')
     {
       hayError = true;
     }
@@ -155,27 +144,15 @@
           	data: { 
                     id : idPro, 
                     act: acPro, 
-                    rz: $('#razon_social').val(),
-                    dir: $('#direccion').val(),
-                    env: $('#envios').val(),
-                    tel: $('#telefono').val(),
-                    tel2: $('#telefono2').val(),
-                    tel3: $('#telefono3').val(),
-                    mai: $('#mail').val(),
-                    web: $('#web').val(),
-                    obs: $('#observacion').val(),
-                    rvn: $('#rv_Nombre').val(),
-                    rvt: $('#rv_telefono').val(),
-                    rvc: $('#rv_mail').val(),
-                    rpn1: $('#rp1_nombre').val(),
-                    rpt1: $('#rp1_telefono').val(),
-                    rpc1: $('#rp1_mail').val(),
-                    rpn2: $('#rp2_nombre').val(),
-                    rpt2: $('#rp2_telefono').val(),
-                    rpc2: $('#rp2_mail').val(),
-                    rpn3: $('#rp3_nombre').val(),
-                    rpt3: $('#rp3_telefono').val(),
-                    rpc3: $('#rp3_mail').val()
+                    nom: $('#prvNombre').val(),
+                    ape: $('#prvApellido').val(),
+                    rz: $('#prvRazonSocial').val(),
+                    tp: $('#docId').val(),
+                    doc: $('#prvDocumento').val(),
+                    dom: $('#prvDomicilio').val(),
+                    mai: $('#prvMail').val(),
+                    est: $('#prvEstado').val(),
+                    tel: $('#prvTelefono').val()
                   },
     		url: 'index.php/provider/setProvider', 
     		success: function(result){

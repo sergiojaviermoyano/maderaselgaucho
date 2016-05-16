@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Polímeros Empaque S.A.</title>
+    <title>Maderas El Gaucho</title>
     <link rel="shortcut icon" href="<?php  echo base_url();?>assets/images/favicon.ico" type="image/x-icon">
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -57,6 +57,8 @@
     <script src="<?php  echo base_url();?>assets/plugin/slimScroll/jquery.slimscroll.min.js"></script>
     <!-- FastClick -->
     <script src="<?php  echo base_url();?>assets/plugin/fastclick/fastclick.min.js"></script>
+    <!-- Money Mask -->
+    <script src="<?php  echo base_url();?>assets/js/jquery.maskMoney.js" type="text/javascript"></script>
 
     <!-- Select2 -->
     <link rel="stylesheet" href="<?php  echo base_url();?>assets/plugin/select2/select2.css">

@@ -11,7 +11,6 @@ class Users extends CI_Model
 	function User_List(){
 
 		$query= $this->db->get('sisusers');
-		//var_dump($query);
 		
 		if ($query->num_rows()!=0)
 		{
@@ -167,10 +166,23 @@ class Users extends CI_Model
 			$query= $this->db->get_where('sisusers',$data);
 			if ($query->num_rows() != 0)
 			{
+				$token = $this->randString(255);
 				$data = $query->result_array();
 				$data[0]['logged_in'] = true;
-				$data[0]['token'] = $this->randString(255);
+				$data[0]['usrToken'] = $token;
+				$data[0]['token'] = $token;
 				$this->session->set_userdata('user_data', $data);
+
+				//Assiganar el token--------------------------------------------------------------
+				//Cambiar el token
+				$update = array(
+					'usrToken'	=> $token
+				);
+				
+				if($this->db->update('sisusers', $update, array('usrId' => $data[0]['usrId'])) == false){
+					return false;
+				}
+				//---------------------------------------------------------------------------------
 
 				$this->updateSession(false);
 
@@ -178,20 +190,17 @@ class Users extends CI_Model
 			} else {
 				return false;
 			}
-
 		}
 	}
 
 	function updateSession($firstTime){
 		//Identificación del usuario logueado
 		$userdata = $this->session->userdata('user_data');
-		//$usrId = $userdata[0]['usrId'];
-		$token = $userdata[0]['usrToken'];
+		$token = $userdata[0]['token'];
 		//-----------------------------------
-
 		$ahora = date('Y-m-d H:i:s');
 		//Validar tiempo de sesión abierto---
-		if($firstTime) //No es la primera vez
+		if($firstTime == true) //No es la primera vez
 		{
 			//Validar horario última operación de la session abierta
 			$query = $this->db->get_where('sisusers', array('usrToken' => $token));
@@ -250,6 +259,8 @@ class Users extends CI_Model
 	}
 
 	function cerrarSession(){
+		$userdata = $this->session->userdata('user_data');
+		$token = $userdata[0]['token'];
 		//Cambiar el token
 		$update = array(
 				'usrToken'	=> $this->randString(255)

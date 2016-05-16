@@ -10,7 +10,7 @@ class Providers extends CI_Model
 	
 	function Providers_List(){
 
-		$this->db->order_by('razon_social', 'asc');
+		$this->db->order_by('prvRazonSocial', 'asc');
 		
 		$query= $this->db->get('proveedores');
 
@@ -37,34 +37,28 @@ class Providers extends CI_Model
 			$data = array();
 
 			//Datos del proveedor
-			$query= $this->db->get_where('proveedores',array('id_proveedor'=>$idPro));
+			$query= $this->db->get_where('proveedores',array('prvId'=>$idPro));
 			if ($query->num_rows() != 0)
 			{
 				$p = $query->result_array();
 				$data['provider'] = $p[0];
 			} else {
 				$Pro = array();
-				$Pro['razon_social'] = '';
-				$Pro['direccion'] = '';
-				$Pro['telefono'] = '';
-				$Pro['mail'] = '';
-				$Pro['web'] = '';
-				$Pro['observacion'] = '';
-				$Pro['telefono2'] = '';
-				$Pro['telefono3'] = '';
-				$Pro['envios'] = '';
-				$Pro['rv_Nombre'] = '';
-				$Pro['rv_telefono'] = '';
-				$Pro['rv_mail'] = '';
-				$Pro['rp1_nombre'] = '';
-				$Pro['rp2_nombre'] = '';
-				$Pro['rp3_nombre'] = '';
-				$Pro['rp1_telefono'] = '';
-				$Pro['rp2_telefono'] = '';
-				$Pro['rp3_telefono'] = '';
-				$Pro['rp1_mail'] = '';
-				$Pro['rp2_mail'] = '';
-				$Pro['rp3_mail'] = '';
+				//select max id de cliente
+				$this->db->select_max('prvId');
+ 				$query = $this->db->get('proveedores');
+ 				$id = $query->result_array();
+				$Pro['prvId'] = $id[0]['prvId'] + 1;
+
+				$Pro['prvNombre'] = '';
+				$Pro['prvApellido'] = '';
+				$Pro['prvRazonSocial'] = '';
+				$Pro['docId'] = '';
+				$Pro['prvDocumento'] = '';
+				$Pro['prvDomicilio'] = '';
+				$Pro['prvMail'] = '';
+				$Pro['prvEstado'] = '';
+				$Pro['prvTelefono'] = '';
 				$data['provider'] = $Pro;
 			}
 
@@ -75,14 +69,14 @@ class Providers extends CI_Model
 			}
 			$data['read'] = $readonly;
 
-			//Products
-			/*
-			$query= $this->db->get_where('admproducts',array('prodStatus'=>'AC'));
+			//Tipos de Documento
+			$this->db->order_by('docDescripcion');
+			$query= $this->db->get_where('tipos_documentos',array('DP'));
 			if ($query->num_rows() != 0)
 			{
-			 	$data['products'] = $query->result_array();	
+				$data['docs'] = $query->result_array();	
 			}
-			*/
+
 			return $data;
 		}
 	}
@@ -96,50 +90,28 @@ class Providers extends CI_Model
 		{
 			$id = $data['id'];
             $act = $data['act'];
+            $id = $data['id'];
+            $act = $data['act'];
+            $nom = $data['nom'];
+            $ape = $data['ape'];
             $rz = $data['rz'];
-            $dir = $data['dir'];
-            $env = $data['env'];
-            $tel = $data['tel'];
-            $tel2 = $data['tel2'];
-            $tel3 = $data['tel3'];
+            $tp = $data['tp'];
+            $doc = $data['doc'];
+            $dom = $data['dom'];
             $mai = $data['mai'];
-            $web = $data['web'];
-            $obs = $data['obs'];
-            $rvn = $data['rvn'];
-            $rvt = $data['rvt'];
-            $rvc = $data['rvc'];
-            $rpt1 = $data['rpt1'];
-            $rpc1 = $data['rpc1'];
-            $rpn1 = $data['rpn1'];
-            $rpn2 = $data['rpn2'];
-            $rpt2 = $data['rpt2'];
-            $rpc2 = $data['rpc2'];
-            $rpn3 = $data['rpn3'];
-            $rpt3 = $data['rpt3'];
-            $rpc3 = $data['rpc3'];
+            $est = $data['est'];
+            $tel = $data['tel'];
 
 			$data = array(
-				   'razon_social' 	=> $rz,
-				   'direccion' 		=> $dir,
-				   'envios' 		=> $env,
-				   'telefono' 		=> $tel,
-				   'telefono2' 		=> $tel2,
-				   'telefono3'		=> $tel3,
-				   'mail'			=> $mai,
-				   'web'			=> $web,
-				   'observacion'	=> $obs, 
-				   'rv_Nombre'		=> $rvn,
-				   'rv_telefono'	=> $rvt,
-				   'rv_mail'		=> $rvc,
-				   'rp1_nombre'		=> $rpn1,
-				   'rp1_telefono'	=> $rpt1,
-				   'rp1_mail'		=> $rpc1,
-				   'rp2_nombre'		=> $rpn2,
-				   'rp2_telefono'	=> $rpt2,
-				   'rp2_mail'		=> $rpc2,
-				   'rp3_nombre'		=> $rpn3,
-				   'rp3_telefono'	=> $rpt3,
-				   'rp3_mail'		=> $rpc3
+				   'prvNombre' 			=> $nom,
+				   'prvApellido' 		=> $ape,
+				   'prvRazonSocial' 	=> $rz,
+				   'docId' 				=> $tp,
+				   'prvDocumento' 		=> $doc,
+				   'prvDomicilio'		=> $dom,
+				   'prvMail'			=> $mai,
+				   'prvEstado'			=> $est,
+				   'prvTelefono'		=> $tel
 				);
 
 			switch($act){
@@ -152,14 +124,14 @@ class Providers extends CI_Model
 				
 				case 'Edit':
 				 	//Actualizar Proveedor
-				 	if($this->db->update('proveedores', $data, array('id_proveedor'=>$id)) == false) {
+				 	if($this->db->update('proveedores', $data, array('prvId'=>$id)) == false) {
 				 		return false;
 				 	}
 				 	break;
 					
 				case 'Del':
 				 	//Eliminar Proveedor
-				 	if($this->db->delete('proveedores', array('id_proveedor'=>$id)) == false) {
+				 	if($this->db->delete('proveedores', array('prvId'=>$id)) == false) {
 				 		return false;
 				 	}
 				 	break;

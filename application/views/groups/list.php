@@ -60,7 +60,7 @@
         "language": {
               "lengthMenu": "Ver _MENU_ filas por página",
               "zeroRecords": "No hay registros",
-              "info": "Mostrando pagina _PAGE_ de _PAGES_",
+              "info": "Mostrando página _PAGE_ de _PAGES_",
               "infoEmpty": "No hay registros disponibles",
               "infoFiltered": "(filtrando de un total de _MAX_ registros)",
               "sSearch": "Buscar:  ",
@@ -91,7 +91,7 @@
     					},
     		error: function(result){
     					WaitingClose();
-    					alert("error");
+    					ProcesarError(result.responseText, 'modalGrp');
     				},
           	dataType: 'json'
     		});
@@ -135,7 +135,7 @@
     					},
     		error: function(result){
     					WaitingClose();
-    					alert("error");
+    					ProcesarError(result.responseText, 'modalGrp');
     				},
           	dataType: 'json'
     		});

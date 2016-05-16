@@ -14,7 +14,7 @@ class group extends CI_Controller {
 	{
 		$data['list'] = $this->Groups->Group_List();
 		$data['permission'] = $permission;
-		$this->load->view('groups/list', $data);
+		echo json_encode($this->load->view('groups/list', $data, true));
 	}
 
 	public function getMenu(){

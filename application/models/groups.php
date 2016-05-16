@@ -11,7 +11,6 @@ class Groups extends CI_Model
 	function Group_List(){
 
 		$query= $this->db->get('sisgroups');
-		//var_dump($query);
 		
 		if ($query->num_rows()!=0)
 		{

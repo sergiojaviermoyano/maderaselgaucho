@@ -14,7 +14,7 @@ class provider extends CI_Controller {
 	{
 		$data['list'] = $this->Providers->Providers_List();
 		$data['permission'] = $permission;
-		$this->load->view('provider/list', $data);
+		echo json_encode($this->load->view('provider/list', $data, true));
 	}
 	
 	public function getProvider(){

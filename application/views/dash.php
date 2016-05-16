@@ -1,13 +1,13 @@
-<body class="skin-green sidebar-mini">
+<body class="skin-yellow sidebar-mini">
     <div class="wrapper">
 
       <header class="main-header">
         <!-- Logo -->
         <a href="../../index2.html" class="logo">
           <!-- mini logo for sidebar mini 50x50 pixels -->
-          <span class="logo-mini"><b>Pol</b></span>
+          <span class="logo-mini">M<b>EG</b></span>
           <!-- logo for regular state and mobile devices -->
-          <span class="logo-lg"><b>Polímeros</b></span>
+          <span class="logo-lg"><b>El Gaucho</b></span>
         </a>
         <!-- Header Navbar: style can be found in header.less -->
         <nav class="navbar navbar-static-top" role="navigation">
@@ -131,7 +131,7 @@
                     </div>
                     -->
                     <div class="pull-right">
-                      <a href="/maderaselgacho/user/cerrarSession" class="btn btn-default btn-flat">Salir</a>
+                      <a href="/maderaselgaucho/user/cerrarSession" class="btn btn-default btn-flat">Salir</a>
                     </div>
                   </li>
                 </ul>

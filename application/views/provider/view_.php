@@ -1,211 +1,100 @@
-<div class="row">
-	<div class="col-xs-12">
-		<div class="alert alert-danger alert-dismissable" id="error" style="display: none">
-	        <h4><i class="icon fa fa-ban"></i> Error!</h4>
-	        Revise que todos los campos esten completos
-      </div>
-	</div>
-</div>
 
-<div class="nav-tabs-custom">
-  <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab_1" data-toggle="tab">General</a></li>
-    <li><a href="#tab_2" data-toggle="tab">Ventas</a></li>
-    <li><a href="#tab_3" data-toggle="tab">Preprensa</a></li>
-  </ul>
-  <div class="tab-content">
-    <div class="tab-pane active" id="tab_1"> <!-- Datos generales del producto -->
+<div class="row">
+  <div class="col-xs-12">
+    <div class="alert alert-danger alert-dismissable" id="error" style="display: none">
+          <h4><i class="icon fa fa-ban"></i> Error!</h4>
+          Revise que todos los campos esten completos
+      </div>
+  </div>
+</div>
+      <div class="row">
+        <div class="col-xs-4">
+            <label style="margin-top: 7px;">Nro. Proveedor <strong style="color: #dd4b39">*</strong>: </label>
+          </div>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" placeholder="" id="prvId" value="<?php echo $data['provider']['prvId'];?>" disabled="disabled" >
+          </div>
+      </div><br>
+      <div class="row">
+        <div class="col-xs-4">
+            <label style="margin-top: 7px;">Nombre : </label>
+          </div>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" placeholder="Sergio Javier" id="prvNombre" value="<?php echo $data['provider']['prvNombre'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
+          </div>
+      </div><br>
+      <div class="row">
+        <div class="col-xs-4">
+            <label style="margin-top: 7px;">Apellido : </label>
+          </div>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" placeholder="Moyano" id="prvApellido" value="<?php echo $data['provider']['prvApellido'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
+          </div>
+      </div><br>
       <div class="row">
         <div class="col-xs-4">
             <label style="margin-top: 7px;">Razón Social <strong style="color: #dd4b39">*</strong>: </label>
           </div>
         <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="La Plastica SRL" id="razon_social" value="<?php echo $data['provider']['razon_social'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
+            <input type="text" class="form-control" placeholder="Indevla.com" id="prvRazonSocial" value="<?php echo $data['provider']['prvRazonSocial'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
           </div>
       </div><br>
       <div class="row">
         <div class="col-xs-4">
-            <label style="margin-top: 7px;">Dirección <strong style="color: #dd4b39">*</strong>: </label>
+            <label style="margin-top: 7px;">Tipo Documento <strong style="color: #dd4b39">*</strong>: </label>
           </div>
         <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="Av. Libertador 123s" id="direccion" value="<?php echo $data['provider']['direccion'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
+            <select class="form-control" id="docId"  <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?> >
+              <?php 
+                foreach($data['docs'] as $d){
+                  echo '<option value="'.$d['docId'].'" '.($data['provider']['docId'] == $d['docId'] ? 'selected' : '').'>'.$d['docDescripcion'].'</option>';
+                }
+              ?>
+            </select>
           </div>
       </div><br>
       <div class="row">
         <div class="col-xs-4">
-            <label style="margin-top: 7px;">Envíos <strong style="color: #dd4b39">*</strong>: </label>
+            <label style="margin-top: 7px;">Documento <strong style="color: #dd4b39">*</strong>: </label>
           </div>
         <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="Aut. Morales" id="envios" value="<?php echo $data['provider']['envios'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
+            <input type="text" class="form-control" placeholder="3124209" id="prvDocumento" value="<?php echo $data['provider']['prvDocumento'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  maxlength="13">
           </div>
       </div><br>
       <div class="row">
         <div class="col-xs-4">
-            <label style="margin-top: 7px;">Teléfono 1 <strong style="color: #dd4b39">*</strong>: </label>
+            <label style="margin-top: 7px;">Domicilio: </label>
           </div>
         <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="telefono" value="<?php echo $data['provider']['telefono'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  maxlength="20">
+            <input type="input" class="form-control" placeholder="ej: Barrio Conjunto 4 M/F Casa/19" id="prvDomicilio" value="<?php echo $data['provider']['prvDomicilio'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
           </div>
       </div><br>
       <div class="row">
         <div class="col-xs-4">
-            <label style="margin-top: 7px;">Teléfono 2 : </label>
+            <label style="margin-top: 7px;">Teléfono: </label>
           </div>
         <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="telefono2" value="<?php echo $data['provider']['telefono2'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  maxlength="20">
+            <input type="text" class="form-control" placeholder="0264 - 4961020" id="prvTelefono" value="<?php echo $data['provider']['prvTelefono'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?> >
           </div>
       </div><br>
       <div class="row">
         <div class="col-xs-4">
-            <label style="margin-top: 7px;">Teléfono 3 : </label>
+            <label style="margin-top: 7px;">Mail: </label>
           </div>
         <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="telefono3" value="<?php echo $data['provider']['telefono3'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  maxlength="20">
+            <input type="text" class="form-control" placeholder="sergio.moyano@outlook.com.ar" id="prvMail" value="<?php echo $data['provider']['prvMail'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?> >
           </div>
       </div><br>
       <div class="row">
         <div class="col-xs-4">
-            <label style="margin-top: 7px;">Correo : </label>
-          </div>
+          <label style="margin-top: 7px;">Estado: </label>
+        </div>
         <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="mail" value="<?php echo $data['provider']['mail'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Web : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="web" value="<?php echo $data['provider']['web'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Observación : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="observacion" value="<?php echo $data['provider']['observacion'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-
-    </div>
-
-
-    <div class="tab-pane" id="tab_2"> <!-- Imagen del cliente -->
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Nombre : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rv_Nombre" value="<?php echo $data['provider']['rv_Nombre'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Teléfono : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rv_telefono" value="<?php echo $data['provider']['rv_telefono'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Correo : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rv_mail" value="<?php echo $data['provider']['rv_mail'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-    </div>  
-
-
-    <div class="tab-pane" id="tab_3"> <!-- Acerca del cliente -->
-       
-       <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Nombre : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp1_nombre" value="<?php echo $data['provider']['rp1_nombre'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Teléfono : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp1_telefono" value="<?php echo $data['provider']['rp1_telefono'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Correo : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp1_mail" value="<?php echo $data['provider']['rp1_mail'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-12">
-          <hr>
+          <select class="form-control" id="prvEstado"  <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?> >
+              <?php 
+                  echo '<option value="AC" '.($data['provider']['prvEstado'] == 'AC' ? 'selected' : '').'>Activo</option>';
+                  echo '<option value="IN" '.($data['provider']['prvEstado'] == 'IN' ? 'selected' : '').'>Inactivo</option>';
+              ?>
+          </select>
         </div>
       </div>
-
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Nombre : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp2_nombre" value="<?php echo $data['provider']['rp2_nombre'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Teléfono : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp2_telefono" value="<?php echo $data['provider']['rp2_telefono'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Correo : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp2_mail" value="<?php echo $data['provider']['rp2_mail'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-12">
-          <hr>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Nombre : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp3_nombre" value="<?php echo $data['provider']['rp3_nombre'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Teléfono : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp3_telefono" value="<?php echo $data['provider']['rp3_telefono'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-      <div class="row">
-        <div class="col-xs-4">
-            <label style="margin-top: 7px;">Correo : </label>
-          </div>
-        <div class="col-xs-5">
-            <input type="text" class="form-control" placeholder="" id="rp3_mail" value="<?php echo $data['provider']['rp3_mail'];?>" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?>  >
-          </div>
-      </div><br>
-       
-    </div>
-  </div>
-</div>

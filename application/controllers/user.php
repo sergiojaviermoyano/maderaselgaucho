@@ -13,7 +13,7 @@ class user extends CI_Controller {
 	{
 		$data['list'] = $this->Users->User_List();
 		$data['permission'] = $permission;
-		$this->load->view('users/list', $data);
+		echo json_encode($this->load->view('users/list', $data, true));
 	}
 	
 	public function getUser(){
@@ -33,6 +33,12 @@ class user extends CI_Controller {
 		{
 			echo json_encode(true);	
 		}
+	}
+
+
+	public function lost(){
+		$data = array();
+		echo json_encode($this->load->view('users/lost', null, true));
 	}
 
 	public function cerrarSession(){
