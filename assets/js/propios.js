@@ -41,6 +41,43 @@ function LoadIconAction(idTag, action){
 			icon = '<i class="fa fa-fw fa-clock-o" style="color: #D81B60"></i>';
 			actt = 'Re-Programar ';
 			break;
+		case	'Disc':
+			icon = '<i class="fa fa-fw fa-ban" style="color: #dd4b39"></i>';
+			actt = 'Descartar ';
+			break;
+		case	'Conf':
+			icon = '<i class="fa fa-fw fa-check" style="color: #00a65a"></i>';
+			actt = 'Confirmar ';
+			break;
+		case 	'Search':
+			icon = '<i class="fa fa-fw fa-search" style="color: #3c8dbc"></i>';
+			actt = 'Buscar ';
+			break;
+		case 	'Play':
+			icon = '<i class="fa fa-fw fa-play" style="color: #00a65a"></i>';
+			actt = 'Producir ';
+			break;
+		case 	'Pause':
+			icon = '<i class="fa fa-fw fa-pause" style="color: #dd4b39"></i>';
+			actt = 'Pausar ';
+			break;
+		case 	'Entr':
+		case 	'EntrM':
+			icon = '<i class="fa fa-fw fa-truck" style="color: #3c8dbc"></i>';
+			actt = 'Entregar ';
+			break;
+		case 	'Finaly':
+			icon = '<i class="fa fa-fw fa-calendar-check-o" style="color: #f39c12"></i>';
+			actt = 'Finalizar ';
+			break;
+		case 	'Reserve':
+			icon = '<i class="fa fa-fw fa-calendar-check-o" style="color: #00a65a"></i>';
+			actt = 'Reservar ';
+			break;
+		case 	'Close':
+			icon = '<i class="fa fa-fw fa-lock" style="color: #00a65a"></i>';
+			actt = 'Cerrar ';
+			break;
 	}
 
 	$('#'+idTag).html(icon + actt);
