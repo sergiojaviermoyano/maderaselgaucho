@@ -7,12 +7,14 @@ class box extends CI_Controller {
         {
 		parent::__construct();
 		$this->load->model('Boxs');
+		$this->load->model('Banks');
 		$this->Users->updateSession(true);
 	}
 
 	public function index($permission)
 	{
 		$data['list'] = $this->Boxs->Box_List();
+		$data['bancos'] = $this->Banks->getActiveBanks();
 		$data['permission'] = $permission;
 		echo json_encode($this->load->view('boxs/list', $data, true));
 	}
@@ -24,9 +26,16 @@ class box extends CI_Controller {
 
 		echo json_encode($response);
 	}
-	/*
-	public function setWood(){
-		$data = $this->Woods->setWood($this->input->post());
+	
+	public function getFactura(){
+		$data['data'] = $this->Boxs->getFactura($this->input->post());
+		$response['html'] = $this->load->view('boxs/factura_', $data, true);
+
+		echo json_encode($response);
+	}
+	
+	public function setFactura(){
+		$data = $this->Boxs->setFactura($this->input->post());
 		if($data  == false)
 		{
 			echo json_encode(false);
@@ -36,6 +45,17 @@ class box extends CI_Controller {
 			echo json_encode(true);	
 		}
 	}
-	*/
+
+	public function setPay(){
+		$data = $this->Boxs->setPay($this->input->post());
+		if($data  == false)
+		{
+			echo json_encode(false);
+		}
+		else
+		{
+			echo json_encode(true);	
+		}
+	}
 	
 }

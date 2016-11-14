@@ -31,6 +31,7 @@
             		echo '<td>';
             		echo '<i class="fa fa-fw fa-print" style="color: #A4A4A4; cursor: pointer; margin-left: 15px;" onclick="PrintRemito('.$remito['remId'].')"></i>';
             		if ($data['type'] == 'BL')
+                        if($remito['remEstado'] == 'AC')
             			echo '<i class="fa fa-fw fa-circle-o text-red" style="cursor: pointer; margin-left: 15px;" onclick="selectRem('.$remito['remId'].', this)"></i>';
             		echo '</td>';
             		echo '<td>'.$remito['remNumero'].'</td>';
@@ -44,11 +45,11 @@
                                 break;
 
                       case 'FA':
-                                echo '<small class="label bg-blue">Facturada</small>';
+                                echo '<small class="label bg-blue">Facturado</small>';
                                 break;
 
                       case 'CN':
-                                echo '<small class="label bg-blue">Cancelada</small>';
+                                echo '<small class="label bg-blue">Cancelado</small>';
                                 break;
 
                       case 'PA':
@@ -73,17 +74,126 @@
         </table>
     </div>
 
-    <div class="tab-pane active" id="tab_2">
-    <?php //var_dump($data['facturas']);?>
+    <div class="tab-pane" id="tab_2">
+        <table id="credit" class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <!--<th width="10%">Acciones</th>-->
+                <th width="15%" colspan="2" style="text-align: center">Factura</th>
+                <th width="15%">Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+                <?php 
+                foreach ($data['facturas'] as $f) {
+                    echo '<tr>';
+                    echo '<td>'.$f['descTalonario'].'</td>';
+                    echo '<td>'.$f['cvNumero'].'</td>';
+                    $date = date_create($f['cvFecha']);                    
+                    echo '<td style="text-align: center">'.date_format($date, 'd-m-Y H:i').'</td>';
+                    echo '<td style="text-align: center">';
+                    switch ($f['cvEstado'])
+                    {
+                      case 'AC': 
+                                echo '<small class="label bg-green">Activa</small>';
+                                break;
+
+                      case 'CN':
+                                echo '<small class="label bg-blue">Cancelada</small>';
+                                break;
+
+                      case 'PA':
+                                echo '<small class="label bg-orange">Parcial</small>';
+                                break;
+
+                      default:
+                                echo '<small class="label bg-gray">'.$f['cvEstado'].'</small>';
+                                break;
+
+                    }
+                    echo '</td>';
+                    echo '</tr>';
+                }
+                ?>                
+            </tbody>
+        </table>
     </div>
 
-    <div class="tab-pane active" id="tab_3">
+    <div class="tab-pane" id="tab_3">
+        <button class="btn btn-success" id="btnPagar" >Registrar Pago</button><br><br>
+        <table id="pagos" class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <!--<th width="10%">Acciones</th>-->
+                <th width="15%" style="text-align: center">Orden</th>
+                <th width="15%">Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+                <?php 
+                foreach ($data['ordenes'] as $o) {
+                    echo '<tr>';                    
+                    echo '<td>'.$o['opId'].'</td>';
+                    $date = date_create($o['opFecha']);                    
+                    echo '<td style="text-align: center">'.date_format($date, 'd-m-Y H:i').'</td>';
+                    echo '<td style="text-align: center">';
+                    switch ($o['opEstado'])
+                    {
+                      case 'AC': 
+                                echo '<small class="label bg-green">Activa</small>';
+                                break;
+
+                      case 'CN':
+                                echo '<small class="label bg-blue">Cancelada</small>';
+                                break;
+
+                      case 'PA':
+                                echo '<small class="label bg-orange">Parcial</small>';
+                                break;
+
+                      default:
+                                echo '<small class="label bg-gray">'.$o['opEstado'].'</small>';
+                                break;
+
+                    }
+                    echo '</td>';
+                    echo '</tr>';
+                }
+                ?>                
+            </tbody>
+        </table>
     </div>
   </div>
 </div>
 
 <script>
 $('#btnFacturar').click(function(){
-  alert('facturando');
+    if(remitosParaFacturar.length <= 0){
+        return ; 
+    }
+    WaitingOpen('Confeccionando Factura...');
+      $.ajax({
+            type: 'POST',
+            data: { list : remitosParaFacturar, cliId : cliId_ },
+            url: 'index.php/box/getFactura', 
+            success: function(result){
+                            WaitingClose();
+                            $("#modalBodyFactura").html(result.html);
+                            setTimeout("$('#modalFactura').modal('show')",800);
+                        },
+            error: function(result){
+                        WaitingClose();
+                        ProcesarError(result.responseText, 'modalFactura');
+                    },
+            dataType: 'json'
+            });
+
+  $('#modalFactura').modal('show');
+});
+
+$('#btnPagar').click(function(){
+    $('#modalPagos').modal('show');
 });
 </script>

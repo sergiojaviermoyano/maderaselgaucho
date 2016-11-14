@@ -100,5 +100,14 @@ class Banks extends CI_Model
 
 		}
 	}
+
+	function getActiveBanks(){
+		$query = $this->db->query('
+				Select *
+				From bancos
+				Where bancoEstado = \'AC\'
+				Order by bancoDescripcion');
+		return $query->result_array();
+	}
 }
 ?>
