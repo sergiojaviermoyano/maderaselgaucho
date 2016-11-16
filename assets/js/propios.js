@@ -73,6 +73,10 @@ function LoadIconAction(idTag, action){
 		case 	'Reserve':
 			icon = '<i class="fa fa-fw fa-calendar-check-o" style="color: #00a65a"></i>';
 			actt = 'Reservar ';
+			break; 
+		case 	'Deposit':
+			icon = '<i class="fa fa-fw fa-thumb-tack" style="color: #3c8dbc;"></i>';
+			actt = 'Depositar ';
 			break;
 		case 	'Close':
 			icon = '<i class="fa fa-fw fa-lock" style="color: #00a65a"></i>';

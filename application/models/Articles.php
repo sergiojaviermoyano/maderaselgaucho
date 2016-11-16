@@ -71,6 +71,7 @@ class Articles extends CI_Model
 				$art['artFleteEsPorcentaje'] = '';
 				$art['artServicio'] = '';
 				$art['artServicioEsPorcentaje'] = '';
+				$art['ivaId'] = '';
 
 				$data['article'] = $art;
 			}
@@ -129,6 +130,13 @@ class Articles extends CI_Model
 			if ($query->num_rows() != 0)
 			{
 				$data['woods'] = $query->result_array();	
+			}
+
+			//Ivas
+			$query= $this->db->get_where('ivas',array('ivaEstado'=>'AC'));
+			if ($query->num_rows() != 0)
+			{
+				$data['ivas'] = $query->result_array();	
 			}
 
 			if($data['article']['artTipoMaterial'] == 'M'){
@@ -199,6 +207,7 @@ class Articles extends CI_Model
             $largo	= $data['largo'];
             $madId  = $data['madId'];
             $det 	= (isset($data['det']) ? $data['det'] : array());
+            $ivaId	= $data['ivaId'];
 
 			$data = array(
 				   'artDescripcion' 				=> $name,
@@ -225,7 +234,8 @@ class Articles extends CI_Model
 				   'artEspesor'						=> $espesor == '' ? null : $espesor,
 				   'artAlto'						=> $ancho == '' ? null : $ancho,
 				   'artlargo'						=> $largo == '' ? null : $largo,
-				   'madId'							=> $mat == 'M' ? $madId : null
+				   'madId'							=> $mat == 'M' ? $madId : null,
+				   'ivaId'							=> $ivaId
 				);
 
 			switch($act){

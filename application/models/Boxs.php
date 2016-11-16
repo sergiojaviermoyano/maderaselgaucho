@@ -74,7 +74,43 @@ class Boxs extends CI_Model
 				From bancos
 				Where bancoEstado = \'AC\'
 				Order by bancoDescripcion');
-			$data['bancos'] = $query->result_array();		
+			$data['bancos'] = $query->result_array();	
+
+			//Estado
+			$estado = array();
+			//Total de Pagos
+			$query = $this->db->query('
+				Select sum(opImportePago) as pagos 
+				From opago
+				join opagodetalle on opagodetalle.opId = opago.opId 
+				Where cliId = '.$cliId); 
+			$pagos = $query->result_array();
+			$estado['pagos'] = $pagos[0]['pagos'];
+
+			//Total deuda
+			if($type == 'BL'){
+				//Calcular sobre los comprobantes de venta
+				$query = $this->db->query('
+					Select sum(cvd.cvdCantidad * cvd.cvdPrecio) as deuda
+					From cventa as cv
+					Join cventadetalle as cvd On cvd.cvId = cv.cvId
+					Where cliId = '.$cliId);
+				$deuda = $query->result_array();
+				$estado['deuda'] = $deuda[0]['deuda'];
+			} else {
+				//Calcular sobre los remitos
+				$query = $this->db->query('
+					Select sum(remitodetalle.remdCantidad * ordendetrabajodetalle.artPrecio) as deuda
+					From ordendetrabajo
+					Join remito On remito.ordId = ordendetrabajo.ordId 
+					Join remitodetalle On remitodetalle.remId = remito.remId
+					Join ordendetrabajodetalle On ordendetrabajodetalle.orddid = remitodetalle.orddId
+					Where cliId = '.$cliId);
+				$deuda = $query->result_array();
+				$estado['deuda'] = $deuda[0]['deuda'];
+			}
+
+			$data['estado'] = $estado;
 
 			return $data;
 		}
@@ -288,11 +324,12 @@ class Boxs extends CI_Model
 			$cliId  = $data['cliId'];
 			$obsv	= $data['obsv'];
 			$efect	= $data['efect'];
-            $cheq	= $data['cheq'];
+            $cheq	= isset($data['cheq']) ? $data['cheq'] : array();
 
 			$data = array(
 					'cliId'			=> $cliId,
-					'opObservacion' => $obsv
+					'opObservacion' => $obsv, 
+					'opType'	=> $type
 				);
 
 			$this->db->trans_begin();
@@ -315,6 +352,40 @@ class Boxs extends CI_Model
 				//Insertar detalla de pago con efectivo
 				if($this->db->insert('opagodetalle', $detail) == false) {
 					return false;
+				}
+			}
+
+			//Hay cheques ?
+			if(count($cheq) > 0){
+				foreach ($cheq as $ch) {
+					$date = explode('-', $ch[1]);
+					$banco = explode('#', $ch[3]);
+					$insertCh = array(
+							'cheNumero'			=> $ch[0], 
+							'cheImporte'		=> $ch[2],
+							'cheVencimiento'	=> $date[2].'-'.$date[1].'-'.$date[0],
+							'bancoId'			=> $banco[0],
+							'cheType'			=> $type
+						);
+
+					if($this->db->insert('cheques', $insertCh) == false) {
+						return false;
+					} else {
+						//Id del cheque insertado
+						$idC = $this->db->insert_id();
+						$detail = array(
+								'opId'			=> $id, 
+								'opMedPago'		=> 'CH',
+								'opImportePago'	=> $ch[2],
+								'chequeId'		=> $idC 
+							);
+
+						//Insertar detalla de pago con efectivo
+						if($this->db->insert('opagodetalle', $detail) == false) {
+							return false;
+						}
+					}
+
 				}
 			}
 

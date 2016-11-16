@@ -11,6 +11,7 @@
     <li class="active"><a href="#tab_1" data-toggle="tab">Remitos</a></li>
     <li><a href="#tab_2" data-toggle="tab" <?php echo ($data['type'] == 'NG' ? 'style="display: none"' : '');?> >Facturas</a></li><!-- <?php echo ($data['article']['artEsSimple'] == true ? 'style="display: none"' : '');?> --> 
     <li><a href="#tab_3" data-toggle="tab">Pagos</a></li>
+    <li><a href="#tab_4" data-toggle="tab">Estado</a></li>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="tab_1">
@@ -165,6 +166,16 @@
             </tbody>
         </table>
     </div>
+
+    <div class="tab-pane" id="tab_4">
+        <h2>Estado cuenta</h2>
+        <h4>
+            Total Deuda Acumulada: <?php echo $data['estado']['deuda']; ?> <br>
+            Total Pagos Acumulados: <?php echo $data['estado']['pagos']; ?> <br>
+        </h4>
+        <h3>Saldo Actualizado: <?php echo $data['estado']['deuda']-$data['estado']['pagos']; ?></h3>
+        <?php //var_dump($data['estado']); ?>
+    </div>
   </div>
 </div>
 
@@ -194,6 +205,39 @@ $('#btnFacturar').click(function(){
 });
 
 $('#btnPagar').click(function(){
+  $('#chequeNro').val('');
+  $('#chequeVto').val('');
+  $('#chequeImporte').val('');
+  $("#cheques tbody").html('');
+  $('#efectivo').val('');
+  $('#observacion').val('');
+  Total_ = 0;
+  $('#lblTotal').html('0.00');
+
     $('#modalPagos').modal('show');
+
 });
+
+function PrintRemito(id__){
+  WaitingOpen('Generando reporte...');
+  LoadIconAction('modalAction__','Print');
+  $.ajax({
+          type: 'POST',
+          data: { 
+                  id : id__
+                },
+      url: 'index.php/order/printRemite', 
+      success: function(result){
+                    WaitingClose();
+                    var url = "./assets/reports/remits/" + result;
+                    $('#printDoc').attr('src', url);
+                    setTimeout("$('#modalPrint').modal('show')",800);
+            },
+      error: function(result){
+            WaitingClose();
+            ProcesarError(result.responseText, 'modalPrint');
+          },
+          dataType: 'json'
+      });
+}
 </script>

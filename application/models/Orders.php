@@ -793,7 +793,12 @@ class Orders extends CI_Model
 		{
 			$id = $data['id'];
 			$data = array();
-			$query = $this->db->get_where('remito', array('remId' => $id));
+			$this->db->select('remito.*, clientes.cliNombre, clientes.cliApellido, clientes.cliDomicilio');
+			$this->db->from('remito');
+			$this->db->join('ordendetrabajo', 'ordendetrabajo.ordId = remito.ordId');
+			$this->db->join('clientes', 'clientes.cliId = ordendetrabajo.cliId');
+			$this->db->where(array('remId' => $id));
+			$query = $this->db->get();
 			$data['remito'] = $query->result_array();
 			
 
@@ -833,29 +838,19 @@ class Orders extends CI_Model
 						</tr>
 					  </table>';
 
-			/*
-			$cliente = false;
-			foreach ($result['customers'] as $customer) {
-				if($customer['cliId'] == $result['order']['cliId']){
-					$cliente = $customer;
-					break;
-				}
-			}
-
 			$html .= '<table style="width: 100%;">
 						<tr>
 							<td style="width: 10%"">Cliente: </td>
-							<td><strong>'.$cliente['cliApellido'].', '.$cliente['cliNombre'].'</strong></td>
+							<td><strong>'.$data['remito'][0]['cliApellido'].', '.$data['remito'][0]['cliNombre'].'</strong></td>
 						</tr>
 						<tr>
 							<td style="width: 10%"">Domicilio: </td>
-							<td><strong>'.$cliente['cliDomicilio'].'</strong></td>
+							<td><strong>'.$data['remito'][0]['cliDomicilio'].'</strong></td>
 						</tr>
 						<tr>
 							<td colspan="2"><hr></td>
 						</tr>
 					  </table>';
-			*/
 			
 			$html .= '<table style="width: 100%;">';
 			$html .= '<tr>';

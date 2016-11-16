@@ -98,6 +98,22 @@
           </div>
       </div><br>
 
+      <!-- Iva -->
+      <div class="row">
+        <div class="col-xs-4">
+            <label style="margin-top: 7px;">IVA: </label>
+          </div>
+        <div class="col-xs-5">
+            <select class="form-control" id="ivaId"  <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?> >
+              <?php 
+                foreach ($data['ivas'] as $i) {
+                  echo '<option value="'.$i['ivaId'].'" '.($data['article']['ivaId'] == $i['ivaId'] ? 'selected' : '').'>'.$i['ivaDescription'].'</option>';
+                }
+              ?>
+            </select>
+          </div>
+      </div><br>
+
       <!-- -->
       <div class="row">
         <div class="col-xs-4">

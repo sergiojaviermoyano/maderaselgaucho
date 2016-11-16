@@ -298,7 +298,6 @@ $('#btnPago').click(function(){
             var obj = [nro , vto, importe, banco];
             cheques.push(obj);
         });
-    debugger;
     $.ajax({
           type: 'POST',
           data: { 

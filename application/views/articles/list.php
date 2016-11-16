@@ -188,7 +188,8 @@
                     ancho:    $('#artAncho').val(),
                     largo:    $('#artLargo').val(),
                     madId:    $('#madId').val(),
-                    det:      detail
+                    det:      detail,
+                    ivaId:    $('#ivaId').val()
                   },
     		url: 'index.php/article/setArticle', 
     		success: function(result){
