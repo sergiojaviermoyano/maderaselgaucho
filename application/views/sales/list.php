@@ -4,24 +4,24 @@
     <div class="col-xs-12">
       <div class="box">
         <div class="box-header">
-          <h3 class="box-title">Ventas</h3>
+          <h3 class="box-title">Compras</h3>
           <?php
             if (strpos($permission,'Add') !== false) {
-              echo '<button class="btn btn-block btn-success" style="width: 100px; margin-top: 10px;" data-toggle="modal" onclick="LoadWood(0,\'Add\')" id="btnAdd">Agregar</button>';
+              echo '<button class="btn btn-block btn-success" style="width: 100px; margin-top: 10px;" data-toggle="modal" onclick="LoadBuy(\'Add\')" id="btnAdd">Agregar</button>';
             }
           ?>
         </div><!-- /.box-header -->
         <div class="box-body">
           <div class="row">
             <div class="col-xs-4">
-                <label style="margin-top: 7px;">Cliente <strong style="color: #dd4b39">*</strong>: </label>
+                <label style="margin-top: 7px;">Proveedor <strong style="color: #dd4b39">*</strong>: </label>
               </div>
             <div class="col-xs-5">
-              <select class="form-control select2" id="cliId" style="width: 100%;" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?> >
+              <select class="form-control select2" id="prvId" style="width: 100%;" <?php echo ($data['read'] == true ? 'disabled="disabled"' : '');?> >
                 <?php 
                   echo '<option value="-1" selected></option>';
-                  foreach ($list as $c) {
-                    echo '<option value="'.$c['cliId'].'" data-balance="'.$c['cliTipo'].'">'.$c['cliTipo'].'-'.$c['cliApellido'].', '.$c['cliNombre'].' ('.$c['cliDocumento'].')</option>'; //data-balance="'.$c['balance'].'" data-address="'.$c['cliAddress'].'" data-dni="'.$c['cliDni'].'"
+                  foreach ($list as $p) {
+                    echo '<option value="'.$p['prvId'].'">'.$p['prvRazonSocial'].'-'.$p['prvApellido'].', '.$p['prvNombre'].' ('.$p['prvDocumento'].')</option>'; //data-balance="'.$c['balance'].'" data-address="'.$c['cliAddress'].'" data-dni="'.$c['cliDni'].'"
                   }
                 ?>
               </select>
@@ -49,7 +49,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel"><span><i class="fa fa-fw  fa-dollar text-green"></i> </span> Agregar Facturación</h4> 
+        <h4 class="modal-title" id="myModalLabel"><span><i class="fa fa-fw  fa-dollar text-green"></i> </span> Agregar Compra</h4> 
       </div>
       <div class="modal-body" id="modalBodyFactura">
         
@@ -80,7 +80,16 @@
           <div class="col-xs-4"><input type="text" class="form-control" id="efectivo"></div>
         </div><br>
         <div class="row">
-          <div class="col-xs-3" style="margin-top: 10px;">Cheques: </div>
+          <div class="col-xs-3">Cheques Tercero: </div>
+          <div class="col-xs-8">
+            <select class="form-control" id="chequesTerceros">
+              <option value="-1">Elija un cheque de Tercero</option>
+            </select>
+          </div>
+          <div class="col-xs-1"><button type="button" class="btn btn-success" id="btnAddChequeTercero"><i class="fa fa-fw fa-plus-square"></i></button></div>
+        </div><br>
+        <div class="row">
+          <div class="col-xs-3" style="margin-top: 10px;">Cheques Propios: </div>
           <div class="col-xs-7"><input type="text" class="form-control" id="chequeNro" value="" placeholder="Número de cheque"></div>
           <div class="col-xs-2"><input type="text" class="form-control" id="chequeImporte" value="" placeholder="0.00"></div>
         </div><br>
@@ -107,6 +116,7 @@
                 <th width="10%">Vencimiento</th>
                 <th width="10%">Importe</th>
                 <th>Banco</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -140,21 +150,19 @@ $("#chequeImporte").maskMoney({allowNegative: false, thousands:'', decimal:'.'})
 $('#chequeVto').datepicker({});
 
 
-$("#cliId").change(function(){
+$("#prvId").change(function(){
   LoadMove();
 });
 
 function LoadMove(){
-  cliId_ = $("#cliId").val();
-  remitosParaFacturar = [];
+  prvId_ = $("#prvId").val();
   WaitingOpen('Cargando Cuenta Corriente...');
       $.ajax({
             type: 'POST',
             data: { 
-                    cliId : $("#cliId").val(), 
-                    type: $("#cliId").find(':selected').data('balance')
+                    prvId : $("#prvId").val()
                   },
-        url: 'index.php/box/getCtaCte', 
+        url: 'index.php/sale/getCtaCte', 
         success: function(result){
                       WaitingClose();
                       $("#ctacteBody").html(result.html);
@@ -167,29 +175,93 @@ function LoadMove(){
         });
 }
 
-var cliId_ = 0;
-var remitosParaFacturar = [];
-function selectRem(remId, puntero){
-  
-  if($(puntero).hasClass( 'fa-circle-o text-red' )){
-    $(puntero).removeClass('fa-circle-o text-red');
-    $(puntero).addClass('fa-check-circle text-green');
-    remitosParaFacturar.push(remId);
-  } else {
-    $(puntero).removeClass('fa-check-circle text-green');
-    $(puntero).addClass('fa-circle-o text-red');
-    var index = remitosParaFacturar.indexOf(remId);
-    remitosParaFacturar.splice(index,1);
-  }
+var prvId_ = 0;
+var action = '';
+var ImporteFcactura = 0;
+function LoadBuy(act){
+  action = act;
+  if(prvId_ == 0) return ;
 
-  if(remitosParaFacturar.length > 0){
-    $('#btnFacturar').removeClass('disabled');
-  } else {
-    $('#btnFacturar').addClass('disabled');
-  }
+  WaitingOpen('cargando Formulario...');
+  $.ajax({
+        type: 'POST',
+        data: { prvId: prvId_ },
+        url: 'index.php/sale/loadFactura', 
+        success: function(result){
+                      WaitingClose();
+                      $("#modalBodyFactura").html(result.html);
+                      $("#importeDetalle").maskMoney({allowNegative: false, thousands:'', decimal:'.'});
+                      $('#modalFactura').modal('show');
+                      
+                    },
+        error: function(result){
+                    WaitingClose();
+                    ProcesarError(result.responseText, 'modalFactura');
+                },
+        dataType: 'json'
+        });
 }
 
 $('#btnSave').click(function(){
+  if(action == 'Add'){
+    if(ImporteFcactura <= 0 || $('#nroFactura').val() == ''){
+      return;
+    } else {
+      //Registrar Factura de Compra
+      var items = [];
+      $("#items tbody tr").each(function (index) 
+          {
+              var detalle, iva, importe;
+              $(this).children("td").each(function (index2) 
+              {
+                  switch (index2) 
+                  {
+                      case 0: 
+                        detalle = $(this).text();
+                        break;
+                      case 1: 
+                        iva = $(this).text();
+                        break;
+                      case 2: 
+                        importe = $(this).text();
+                        break;
+                  }
+              });
+
+              var obj = [detalle , iva, importe];
+              items.push(obj);
+          });
+
+      if(items.length <= 0) return;
+
+      $.ajax({
+        type: 'POST',
+        data: { 
+                list : items, 
+                prvId : prvId_,
+                tipo :  $('#tipoFactura').val(),
+                nro: $('#nroFactura').val()
+              },
+        url: 'index.php/sale/setFactura', 
+        success: function(result){
+                        if(result){
+                          $('#modalFactura').modal('hide');
+                          LoadMove();
+                        } else {
+                          WaitingClose();
+                          ProcesarError(result.responseText, 'modalFactura');      
+                        }
+                    },
+        error: function(result){
+                    WaitingClose();
+                    ProcesarError(result.responseText, 'modalFactura');
+                },
+        dataType: 'json'
+        });
+    }
+  }
+  /*
+  return;
   WaitingOpen('Confeccionando Factura...');
   $.ajax({
         type: 'POST',
@@ -210,6 +282,29 @@ $('#btnSave').click(function(){
                 },
         dataType: 'json'
         });
+  */
+});
+
+$('#btnAddChequeTercero').click(function(){
+  if(
+      $('#chequesTerceros').val() == -1
+    ){
+    return;
+  }
+
+  //Agregar a la tabla de cheques
+  var row = '<tr><td>'+$('#chequesTerceros').val()+'</td>';
+  row +=    '<td>'+$("#chequesTerceros").find(':selected').data('numero')+'</td>';
+  var fecha = $("#chequesTerceros").find(':selected').data('vence').split('-');
+  row +=    '<td>'+fecha[2]+'-'+fecha[1]+'-'+fecha[0]+'</td>';
+  row +=    '<td>'+$("#chequesTerceros").find(':selected').data('importe')+'</td>';
+  row +=    '<td>'+$("#chequesTerceros").find(':selected').data('banid')+'#'+$("#chequesTerceros").find(':selected').data('banco')+'</td>';
+  row +=    '<td>T</td>';
+  row +=    '</tr>';
+  $('#cheques > tbody').prepend(row);
+
+  CalcularTotal();
+
 });
 
 $('#btnAddCheque').click(function(){
@@ -228,6 +323,7 @@ $('#btnAddCheque').click(function(){
   row +=    '<td>'+$('#chequeVto').val()+'</td>';
   row +=    '<td>'+$('#chequeImporte').val()+'</td>';
   row +=    '<td>'+$('#chequeBanco').val()+'#'+$("#chequeBanco").find(':selected').data('name')+'</td>';
+  row +=    '<td>P</td>';
   row +=    '</tr>';
   $('#cheques > tbody').prepend(row);
 
@@ -275,11 +371,14 @@ $('#btnPago').click(function(){
     var cheques = [];
     $("#cheques tbody tr").each(function (index) 
         {
-            var nro, importe, vto, banco;
+            var id, nro, importe, vto, banco, tipo;
             $(this).children("td").each(function (index2) 
             {
                 switch (index2) 
                 {
+                    case 0: 
+                      id = $(this).text();
+                      break;
                     case 1: 
                       nro = $(this).text();
                       break;
@@ -292,22 +391,24 @@ $('#btnPago').click(function(){
                     case 4: 
                       banco = $(this).text();
                       break;
+                    case 5: 
+                      tipo = $(this).text();
+                      break;
                 }
             });
 
-            var obj = [nro , vto, importe, banco];
+            var obj = [id, nro , vto, importe, banco, tipo];
             cheques.push(obj);
         });
     $.ajax({
           type: 'POST',
           data: { 
-                  cliId : $("#cliId").val(), 
-                  type: $("#cliId").find(':selected').data('balance'),
+                  prvId : $("#prvId").val(), 
                   obsv: $('#observacion').val(),
                   efect: $('#efectivo').val(),
                   cheq: cheques
                 },
-      url: 'index.php/box/setPay', 
+      url: 'index.php/sale/setPay', 
       success: function(result){
                     if(result){
                       $('#modalPagos').modal('hide');

@@ -49,7 +49,19 @@
                     $date = date_create($c['cheVencimiento']);                    
                     echo '<td style="text-align: center">'.date_format($date, 'd-m-Y').'</td>';
                     //echo '<td style="text-align: center">'.$c['cheEstado'].'</td>';
-                    echo '<td style="text-align: center">'.($c['cheEstado'] === 'AC' ? '<small class="label bg-green">Activo</small>': '<small class="label bg-yellow">Depositado</small>') .'</td>';
+                    echo '<td style="text-align: center">';
+                    switch($c['cheEstado']){
+                      case 'AC':
+                        echo '<small class="label bg-green">Activo</small>';
+                        break;
+                      case 'UT':
+                        echo '<small class="label bg-blue">Utilizado</small>';
+                        break;
+                      case 'DP':
+                        echo '<small class="label bg-yellow">Depositado</small>';
+                        break;
+                    } 
+                    echo '</td>';
                     echo '<td style="text-align: center">';
                     if ($c['cheType'] == 'BL'){
                       echo '<i class="fa fa-fw fa-circle-o"></i>';
