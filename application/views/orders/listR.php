@@ -159,6 +159,7 @@
 </section><!-- /.content -->
 
 <script>
+$('#remitoDate').datepicker({maxDate: 0});
 $('#table_search').keyup(function(e) {
     var code = (e.keyCode ? e.keyCode : e.which);
     if (code==13) {
@@ -376,11 +377,11 @@ $('#table_search').keyup(function(e) {
                     OC:    $('#ordNumeroOC').val(),
                     obsv:  $('#ordObservacion').val(),
                     est:   $('#ordEstado').val(),
-                    det:   orderD
+                    det:   orderD,
+                    fecha: $('#remitoDate').val()
                   },
         url: 'index.php/order/setorder', 
         success: function(result){
-          debugger;
                       $('#modalReception').modal('hide');
                       if(action != 'EntrM'){
                         WaitingClose();
@@ -523,6 +524,7 @@ function production(){
         
       </div>
       <div class="modal-footer">
+      <input type="text" class="btn btn-default" id="remitoDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="btnSave">Guardar</button>
       </div>

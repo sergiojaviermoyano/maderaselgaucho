@@ -248,6 +248,7 @@ class Orders extends CI_Model
 	        $oc 	= $data['OC'];
 	        $est 	= $data['est'];
 	        $det 	= isset($data['det']) ? $data['det'] : array();
+			$fecha 	= $data['fecha'];
 			
 			$data = array(
 					   'cliId'		 	=> $cliId,
@@ -466,6 +467,11 @@ class Orders extends CI_Model
 						} else {
 							$remito['remNumero'] = $this->getNumero('Int');
 						}
+					}
+					
+					if($fecha != ''){
+						$fecha = explode('-',$fecha);
+						$remito['remFecha'] = $fecha[2].'-'.$fecha[1].'-'.$fecha[0].' 09:00:00'; 
 					}
 
 					if($this->db->insert('remito', $remito) == false) {
