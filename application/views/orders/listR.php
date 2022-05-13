@@ -524,7 +524,7 @@ function production(){
         
       </div>
       <div class="modal-footer">
-      <input type="text" class="btn btn-default" id="remitoDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
+        <input type="text" class="btn btn-default" id="remitoDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="btnSave">Guardar</button>
       </div>

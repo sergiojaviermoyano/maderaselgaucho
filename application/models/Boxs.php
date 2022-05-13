@@ -37,7 +37,7 @@ class Boxs extends CI_Model
 			$cliId 	= $data['cliId'];
 			$type 	= $data['type'];
 
-			$data = array();
+			//$data = array();
 
 			//Orden de Trabajo
 			if($type == 'BL'){ //+ (b.artPrecio * (d.ivaPorcent / 100))
@@ -494,6 +494,103 @@ class Boxs extends CI_Model
 			return $cventa;
 			//var_dump($oPago);
 		}
+	}
+
+	function calcularExtracto($data){
+		$cliId 	= $data['cliId'];
+		$type	= $data['type']; 
+		$desde	= $data['from'];
+		$hasta	= $data['to'];
+
+		$desde = explode('-',$desde);
+		$desde = $desde[2].'-'.$desde[1].'-'.$desde[0].' 00:00:00'; 
+
+		$hasta = explode('-',$hasta);
+		$hasta = $hasta[2].'-'.$hasta[1].'-'.$hasta[0].' 23:59:59'; 
+		//Calcular el saldo
+		$data= array();
+		//Saldo debe
+		if($type == 'BL'){ //+ (b.artPrecio * (d.ivaPorcent / 100))
+			$query = $this->db->query('
+			Select 
+				(select sum((od.artPrecio * rd.remdCantidad) * 1.21) 
+				from remitodetalle as rd 
+				join ordendetrabajodetalle as od on od.orddId = rd.orddId 
+				where rd.remId = r.remId) as total
+			From remito as r
+			Join ordendetrabajo as o On o.ordId = r.ordId 
+			Where o.cliId = '.$cliId.' and r.remFecha < \''.$desde.'\' ');
+			} else {
+				$query = $this->db->query('
+				Select 
+					(select sum(od.artPrecio * rd.remdCantidad) 
+					from remitodetalle as rd 
+					join ordendetrabajodetalle as od on od.orddId = rd.orddId 
+					where rd.remId = r.remId) as total
+				From remito as r
+				Join ordendetrabajo as o On o.ordId = r.ordId 
+				Where o.cliId = '.$cliId.' and r.remFecha < \''.$desde.'\' ');
+			}
+
+		$data['saldoDebe'] = 0;
+		foreach($query->result_array() as $item){
+			$data['saldoDebe'] += $item['total'];
+
+		}
+		
+		
+		//Saldo haber
+		$query = $this->db->query('
+		Select (select sum(opImportePago) from opagodetalle as b where b.opId = a.opId ) as total
+			From opago as a
+			Where a.cliId = '.$cliId.' and a.opFecha < \''.$desde.'\' ');
+
+		$data['saldoHaber'] = 0;
+		foreach($query->result_array() as $item){
+			$data['saldoHaber'] += $item['total'];
+		}
+		//---------------------------------------------------------------------------------------
+		if($type == 'BL'){ //+ (b.artPrecio * (d.ivaPorcent / 100))
+			$query1 = '
+			Select r.remNumero as id , 
+				(select sum((od.artPrecio * rd.remdCantidad) * 1.21) 
+				from remitodetalle as rd 
+				join ordendetrabajodetalle as od on od.orddId = rd.orddId 
+				where rd.remId = r.remId) as total, r.remFecha as fecha, 1 as tipo
+			From remito as r
+			Join ordendetrabajo as o On o.ordId = r.ordId 
+			Where o.cliId = '.$cliId.' and r.remFecha between \''.$desde.'\' and \''.$hasta.'\'  ';
+			} else {
+				$query1 = '
+				Select r.remNumero as id, 
+					(select sum(od.artPrecio * rd.remdCantidad) 
+					from remitodetalle as rd 
+					join ordendetrabajodetalle as od on od.orddId = rd.orddId 
+					where rd.remId = r.remId) as total, r.remFecha as fecha, 1 as tipo
+				From remito as r
+				Join ordendetrabajo as o On o.ordId = r.ordId 
+				Where o.cliId = '.$cliId.' and r.remFecha between \''.$desde.'\' and \''.$hasta.'\'  ';
+			}
+
+		$query2 = '
+			Select a.opId as id , 
+					(select sum(opImportePago) from opagodetalle as b where b.opId = a.opId ) as total,
+					a.opFecha as fecha, -1 as tipo
+			From opago as a
+			Where a.cliId = '.$cliId.' and a.opFecha between \''.$desde.'\' and \''.$hasta.'\'  ';
+
+		$query = $this->db->query('( ' .$query1. ' ) union (' .$query2 .' ) order by fecha asc ');
+		$data['debe'] = $query->result_array();
+		
+		// $query = $this->db->query('
+		// Select a.opId, (select sum(opImportePago) from opagodetalle as b where b.opId = a.opId ) as total
+		// 	From opago as a
+		// 	Where a.cliId = '.$cliId.' and a.opFecha between \''.$desde.'\' and \''.$hasta.'\'  ');
+
+		// $data['haber'] = $query->result_array();
+		//---------------------------------------------------------------------------------------
+
+		return $data;
 	}
 }
 ?>

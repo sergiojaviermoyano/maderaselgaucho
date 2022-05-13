@@ -1,3 +1,5 @@
+<input type="hidden" id="idClie_" value="<?php echo $data['cliId'];?>">
+<input type="hidden" id="typeClie_" value="<?php echo $data['type'];?>">
 <div class="row">
 	<div class="col-xs-12">
 		<div class="alert alert-danger alert-dismissable" id="error" style="display: none">
@@ -12,6 +14,7 @@
     <li><a href="#tab_2" data-toggle="tab" <?php echo ($data['type'] == 'NG' ? 'style="display: none"' : '');?> >Facturas</a></li><!-- <?php echo ($data['article']['artEsSimple'] == true ? 'style="display: none"' : '');?> --> 
     <li><a href="#tab_3" data-toggle="tab">Pagos</a></li>
     <li><a href="#tab_4" data-toggle="tab">Estado</a></li>
+    <li><a href="#tab_5" data-toggle="tab">Consultas</a></li>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="tab_1">
@@ -190,10 +193,50 @@
         <h3>Saldo Actualizado: <?php echo $data['estado']['deuda']-$data['estado']['pagos']; ?></h3>
         <?php //var_dump($data['estado']); ?>
     </div>
+
+    <div class="tab-pane" id="tab_5">
+      <input type="text" class="btn btn-default" id="fromDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">  
+      <input type="text" class="btn btn-default" id="toDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
+      <button type="button" class="btn btn-primary" id="btnConsultar">Consultar</button>
+      <hr>
+              <div id="estadoCuenta">
+
+              </div>
+    </div>
   </div>
 </div>
 
 <script>
+  $('#fromDate').datepicker({maxDate: 0});
+  $('#toDate').datepicker({maxDate: 0});
+$('#btnConsultar').click(function(){
+  //estadoCuenta
+  if($('#fromDate').val() == '' || $('#toDate').val() == ''){
+    return;
+  }  
+  $("#estadoCuenta").html('');
+  WaitingOpen('Consultando...');
+  $.ajax({
+        type: 'POST',
+        data: { 
+                cliId : $('#idClie_').val(),
+                type  : $('#typeClie_').val(),
+                from  : $('#fromDate').val(),
+                to    : $('#toDate').val()
+              },
+        url: 'index.php/box/getExtracto', 
+        success: function(result){
+                        WaitingClose();
+                        $("#estadoCuenta").html(result.html);
+                    },
+        error: function(result){
+                    WaitingClose();
+                    ProcesarError(result.responseText, 'modal');
+                },
+        dataType: 'json'
+        });
+});
+
 $('#btnFacturar').click(function(){
     if(remitosParaFacturar.length <= 0){
         return ; 

@@ -73,4 +73,13 @@ class box extends CI_Controller {
 		echo json_encode($response);
 		//echo json_encode(true);
 	}
+
+	function getExtracto(){
+		$data['data'] = $this->Boxs->calcularExtracto($this->input->post());
+		$response['html'] = $this->load->view('boxs/extracto_', $data, true);
+
+		echo json_encode($response);
+		//echo json_encode(true);
+	}
+	
 }

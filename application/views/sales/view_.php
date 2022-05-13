@@ -11,6 +11,7 @@
     <li class="active"><a href="#tab_2" data-toggle="tab" >Facturas</a></li><!-- <?php echo ($data['article']['artEsSimple'] == true ? 'style="display: none"' : '');?> --> 
     <li><a href="#tab_3" data-toggle="tab">Pagos</a></li>
     <li><a href="#tab_4" data-toggle="tab">Estado</a></li>
+    <li><a href="#tab_5" data-toggle="tab">Consulta</a></li>
   </ul>
   <div class="tab-content">
 
@@ -136,6 +137,10 @@
         </h4>
         <h3>Saldo Actualizado: <?php echo $data['estado']['deuda']-$data['estado']['pagos']; ?></h3>
         <?php //var_dump($data['estado']); ?>
+    </div>
+
+    <div class="tab-pane" id="tab_5">
+                Consultas
     </div>
   </div>
 </div>
