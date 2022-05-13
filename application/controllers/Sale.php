@@ -37,14 +37,14 @@ class sale extends CI_Controller {
 	public function getChequesActivos(){
 		echo json_encode($this->Sales->getChequesActivos($this->input->post()));
 	}
-	/*
-	public function getFactura(){
-		$data['data'] = $this->Boxs->getFactura($this->input->post());
-		$response['html'] = $this->load->view('boxs/factura_', $data, true);
+
+	public function getFactura_(){
+		$data['data'] = $this->Sales->getFactura_($this->input->post());
+		$response['html'] = $this->load->view('sales/facturaview_', $data, true);
 
 		echo json_encode($response);
 	}
-	*/
+	
 	public function setFactura(){
 		$data = $this->Sales->setFactura($this->input->post());
 		if($data  == false)
@@ -67,5 +67,12 @@ class sale extends CI_Controller {
 		{
 			echo json_encode(true);	
 		}
+	}
+
+	function getPago(){
+		$data['data'] = $this->Sales->getPago($this->input->post());
+		$response['html'] = $this->load->view('sales/pago_', $data, true);
+
+		echo json_encode($response);
 	}
 }

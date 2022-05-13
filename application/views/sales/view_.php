@@ -18,16 +18,20 @@
         <table id="credit" class="table table-bordered table-hover">
             <thead>
               <tr>
-                <!--<th width="10%">Acciones</th>-->
-                <th width="15%" colspan="2" style="text-align: center">Factura</th>
-                <th width="15%">Fecha</th>
-                <th>Estado</th>
+                <th width="10%" style="text-align: center">Acciones</th>
+                <th width="25%" colspan="2" style="text-align: center">Factura</th>
+                <th width="15%" style="text-align: center">Fecha</th>
+                <th style="text-align: center">Importe</th>
+                <th width="15%" style="text-align: center">Estado</th>
               </tr>
             </thead>
             <tbody>
                 <?php 
                 foreach ($data['facturas'] as $f) {
                     echo '<tr>';
+                    echo '<td style="text-align: center">
+                      <i class="fa fa-fw fa-search" style="color: #3c8dbc; cursor: pointer;" onclick="LoadFactura('.$f['ccId'].')"></i>';
+                    '</td>';
                     echo '<td>';
                     switch($f['ccTipo']){
                       case 'FA':
@@ -44,6 +48,7 @@
                     echo '<td>'.$f['ccNumero'].'</td>';
                     $date = date_create($f['ccFecha']);                    
                     echo '<td style="text-align: center">'.date_format($date, 'd-m-Y H:i').'</td>';
+                    echo '<td style="text-align: right">$'.number_format($f['total'],2,',','.').'</td>';
                     echo '<td style="text-align: center">';
                     switch ($f['ccEstado'])
                     {
@@ -77,19 +82,24 @@
         <table id="pagos" class="table table-bordered table-hover">
             <thead>
               <tr>
-                <!--<th width="10%">Acciones</th>-->
+                <th width="10%" style="text-align: center">Acciones</th>
                 <th width="15%" style="text-align: center">Orden</th>
-                <th width="15%">Fecha</th>
-                <th>Estado</th>
+                <th width="15%" style="text-align: center">Fecha</th>
+                <th style="text-align: center">Total</th>
+                <th width="15%" style="text-align: center">Estado</th>
               </tr>
             </thead>
             <tbody>
                 <?php 
                 foreach ($data['ordenes'] as $o) {
-                    echo '<tr>';                    
-                    echo '<td>'.$o['opId'].'</td>';
+                    echo '<tr>';
+                    echo '<td style="text-align: center">
+                      <i class="fa fa-fw fa-search" style="color: #3c8dbc; cursor: pointer;" onclick="LoadPago('.$o['opId'].')"></i>';
+                    '</td>';                  
+                    echo '<td style="text-align: center">'.$o['opId'].'</td>';
                     $date = date_create($o['opFecha']);                    
                     echo '<td style="text-align: center">'.date_format($date, 'd-m-Y H:i').'</td>';
+                    echo '<td style="text-align: right">$'.number_format($o['total'],2,',','.').'</td>';
                     echo '<td style="text-align: center">';
                     switch ($o['opEstado'])
                     {
@@ -194,28 +204,56 @@ $('#btnPagar').click(function(){
       });
 
 });
-/*
-function PrintRemito(id__){
-  WaitingOpen('Generando reporte...');
-  LoadIconAction('modalAction__','Print');
-  $.ajax({
-          type: 'POST',
-          data: { 
-                  id : id__
-                },
-      url: 'index.php/order/printRemite', 
-      success: function(result){
-                    WaitingClose();
-                    var url = "./assets/reports/remits/" + result;
-                    $('#printDoc').attr('src', url);
-                    setTimeout("$('#modalPrint').modal('show')",800);
-            },
-      error: function(result){
-            WaitingClose();
-            ProcesarError(result.responseText, 'modalPrint');
-          },
-          dataType: 'json'
-      });
+
+function LoadFactura(id){
+  WaitingOpen('Consultando Factura...');
+   $.ajax({
+           type: 'POST',
+           data: { 
+                   ccId: id
+                 },
+       url: 'index.php/sale/getFactura_', 
+       success: function(result){
+                     if(result){
+                       $('#modalBodyFacturaView').html(result.html);
+                       $('#modalFacturaView').modal('show');
+                       WaitingClose();
+                     } else {
+                       WaitingClose();
+                       ProcesarError(result.responseText, 'modalFacturaView');      
+                     }
+             },
+       error: function(result){
+             WaitingClose();
+              ProcesarError(result.responseText, 'modalFacturaView');   
+           },
+           dataType: 'json'
+       });
 }
-*/
+
+function LoadPago(id){
+  WaitingOpen('Consultando Pago...');
+   $.ajax({
+           type: 'POST',
+           data: { 
+                   opId: id
+                 },
+       url: 'index.php/sale/getPago', 
+       success: function(result){
+                     if(result){
+                       $('#modalBodyView').html(result.html);
+                       $('#modalPagosView').modal('show');
+                       WaitingClose();
+                     } else {
+                       WaitingClose();
+                       ProcesarError(result.responseText, 'modalPagosView');      
+                     }
+             },
+       error: function(result){
+             WaitingClose();
+              ProcesarError(result.responseText, 'modalPagosView');   
+           },
+           dataType: 'json'
+       });
+}
 </script>

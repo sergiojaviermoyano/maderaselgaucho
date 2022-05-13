@@ -55,6 +55,7 @@
         
       </div>
       <div class="modal-footer">
+        <input type="text" class="btn btn-default" id="facturaDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="btnSave">Guardar</button>
       </div>
@@ -135,6 +136,7 @@
         </div>
       </div>
       <div class="modal-footer">
+        <input type="text" class="btn btn-default" id="facturapagoDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="btnPago">Guardar</button>
       </div>
@@ -148,6 +150,8 @@ $(".select2").select2();
 $("#efectivo").maskMoney({allowNegative: false, thousands:'', decimal:'.'});
 $("#chequeImporte").maskMoney({allowNegative: false, thousands:'', decimal:'.'});
 $('#chequeVto').datepicker({});
+$('#facturaDate').datepicker({maxDate: 0});
+$('#facturapagoDate').datepicker({maxDate: 0});
 
 
 $("#prvId").change(function(){
@@ -240,7 +244,8 @@ $('#btnSave').click(function(){
                 list : items, 
                 prvId : prvId_,
                 tipo :  $('#tipoFactura').val(),
-                nro: $('#nroFactura').val()
+                nro: $('#nroFactura').val(),
+                fecha: $('#facturaDate').val()
               },
         url: 'index.php/sale/setFactura', 
         success: function(result){
@@ -406,7 +411,8 @@ $('#btnPago').click(function(){
                   prvId : $("#prvId").val(), 
                   obsv: $('#observacion').val(),
                   efect: $('#efectivo').val(),
-                  cheq: cheques
+                  cheq: cheques,
+                  fecha: $('#facturapagoDate').val()
                 },
       url: 'index.php/sale/setPay', 
       success: function(result){
@@ -427,3 +433,38 @@ $('#btnPago').click(function(){
   }
 });
 </script>
+
+
+<div class="modal fade" id="modalFacturaView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document" style="width: 60%">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><span><i class="fa fa-fw fa-search" style="color: #3c8dbc"></i> </span> Consultar Factura</h4> 
+      </div>
+      <div class="modal-body" id="modalBodyFacturaView">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalPagosView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document" style="width: 60%">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><span><i class="fa fa-fw fa-search" style="color: #3c8dbc"></i> </span> Consultar Pago</h4> 
+      </div>
+      <div class="modal-body" id="modalBodyView">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

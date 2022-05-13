@@ -55,6 +55,7 @@
         
       </div>
       <div class="modal-footer">
+        <input type="text" class="btn btn-default" id="remDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="btnSave">Guardar</button>
       </div>
@@ -125,6 +126,7 @@
         </div>
       </div>
       <div class="modal-footer">
+        <input type="text" class="btn btn-default" id="pagoDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="btnPago">Guardar</button>
       </div>
@@ -138,6 +140,8 @@ $(".select2").select2();
 $("#efectivo").maskMoney({allowNegative: false, thousands:'', decimal:'.'});
 $("#chequeImporte").maskMoney({allowNegative: false, thousands:'', decimal:'.'});
 $('#chequeVto').datepicker({});
+$('#remDate').datepicker({maxDate: 0});
+$('#pagoDate').datepicker({maxDate: 0});
 
 
 $("#cliId").change(function(){
@@ -193,7 +197,7 @@ $('#btnSave').click(function(){
   WaitingOpen('Confeccionando Factura...');
   $.ajax({
         type: 'POST',
-        data: { list : remitosParaFacturar, cliId : cliId_ },
+        data: { list : remitosParaFacturar, cliId : cliId_ , fecha: $('#remDate').val()},
         url: 'index.php/box/setFactura', 
         success: function(result){
                         if(result){
@@ -305,7 +309,8 @@ $('#btnPago').click(function(){
                   type: $("#cliId").find(':selected').data('balance'),
                   obsv: $('#observacion').val(),
                   efect: $('#efectivo').val(),
-                  cheq: cheques
+                  cheq: cheques,
+                  fecha: $('#pagoDate').val()
                 },
       url: 'index.php/box/setPay', 
       success: function(result){
@@ -325,4 +330,39 @@ $('#btnPago').click(function(){
       });
   }
 });
+
+ 
 </script>
+<div class="modal fade" id="modalPagosView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document" style="width: 60%">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><span><i class="fa fa-fw fa-search" style="color: #3c8dbc"></i> </span> Consultar Pago</h4> 
+      </div>
+      <div class="modal-body" id="modalBodyView">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalFacturaView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document" style="width: 60%">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><span><i class="fa fa-fw fa-search" style="color: #3c8dbc"></i> </span> Consultar Factura</h4> 
+      </div>
+      <div class="modal-body" id="modalBodyFacturaView">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

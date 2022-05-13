@@ -15,14 +15,20 @@
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="tab_1">
+    <div class="row">
+	    <div class="col-xs-1">
+        <button class="btn btn-success disabled" id="btnFacturar" <?php echo ($data['type'] == 'NG' ? 'style="display: none"' : '');?> >Facturar</button>
+      </div>
+    </div>
     	<table id="credit" class="table table-bordered table-hover">
             <thead>
-              <tr>
-                <th width="10%">Acciones</th>
-                <th width="10%">Número</th>
-                <th width="15%">Fecha</th>
-                <th>Estado</th>
-                <th>Orden Trabajo</th>
+              <tr >
+                <th style="text-align: center" width="10%"></th>
+                <th style="text-align: center" width="10%">Número</th>
+                <th style="text-align: center" width="15%">Fecha</th>
+                <th style="text-align: center" width="15%">Importe</th>
+                <th style="text-align: center" width="15%">Orden Trabajo</th>
+                <th style="text-align: center">Estado</th>
               </tr>
             </thead>
             <tbody>
@@ -35,10 +41,12 @@
                         if($remito['remEstado'] == 'AC')
             			echo '<i class="fa fa-fw fa-circle-o text-red" style="cursor: pointer; margin-left: 15px;" onclick="selectRem('.$remito['remId'].', this)"></i>';
             		echo '</td>';
-            		echo '<td>'.$remito['remNumero'].'</td>';
+            		echo '<td style="text-align: right">'.$remito['remNumero'].'</td>';
             		$date = date_create($remito['remFecha']);                    
                     echo '<td style="text-align: center">'.date_format($date, 'd-m-Y H:i').'</td>';
-            		echo '<td style="text-align: center">';
+                    echo '<td style="text-align: right">'.number_format($remito['total'],2,',','.').'</td>';
+                    echo '<td style="text-align: right">'.str_pad($remito['ordId'], 8, "0", STR_PAD_LEFT).'</td>';
+            		    echo '<td style="text-align: center">';
                     switch ($remito['remEstado'])
                     {
                       case 'AC': 
@@ -62,16 +70,10 @@
                                 break;
 
                     }
-            		echo '<td>'.str_pad($remito['ordId'], 8, "0", STR_PAD_LEFT).'</td>';
             		echo '</tr>';	
             	}
             	?>
             </tbody>
-            <tfoot>
-            	<tr>
-            		<td colspan="7"><button class="btn btn-success disabled" id="btnFacturar" <?php echo ($data['type'] == 'NG' ? 'style="display: none"' : '');?> >Facturar</button></td>
-            	</tr>
-            </tfoot>
         </table>
     </div>
 
@@ -80,19 +82,25 @@
             <thead>
               <tr>
                 <!--<th width="10%">Acciones</th>-->
+                <th style="text-align: center" width="1%"></th>
                 <th width="15%" colspan="2" style="text-align: center">Factura</th>
-                <th width="15%">Fecha</th>
-                <th>Estado</th>
+                <th width="15%" style="text-align: center">Fecha</th>
+                <th width="15%" style="text-align: center">Total</th>
+                <th style="text-align: center">Estado</th>
               </tr>
             </thead>
             <tbody>
                 <?php 
                 foreach ($data['facturas'] as $f) {
                     echo '<tr>';
+                    echo '<td style="text-align: center">
+                      <i class="fa fa-fw fa-search" style="color: #3c8dbc; cursor: pointer;" onclick="LoadFactura('.$f['cvId'].')"></i>';
+                    '</td>'; 
                     echo '<td>'.$f['descTalonario'].'</td>';
                     echo '<td>'.$f['cvNumero'].'</td>';
                     $date = date_create($f['cvFecha']);                    
                     echo '<td style="text-align: center">'.date_format($date, 'd-m-Y H:i').'</td>';
+                    echo '<td style="text-align: right">'.number_format($f['total'],2,',','.').'</td>';
                     echo '<td style="text-align: center">';
                     switch ($f['cvEstado'])
                     {
@@ -127,18 +135,24 @@
             <thead>
               <tr>
                 <!--<th width="10%">Acciones</th>-->
+                <th style="text-align: center" width="1%"></th>
                 <th width="15%" style="text-align: center">Orden</th>
                 <th width="15%">Fecha</th>
+                <th width="15%" style="text-align: center">Importe</th>
                 <th>Estado</th>
               </tr>
             </thead>
             <tbody>
                 <?php 
                 foreach ($data['ordenes'] as $o) {
-                    echo '<tr>';                    
+                    echo '<tr>'; 
+                    echo '<td style="text-align: center">
+                        <i class="fa fa-fw fa-search" style="color: #3c8dbc; cursor: pointer;" onclick="LoadPago('.$o['opId'].')"></i>';
+                      '</td>';                   
                     echo '<td>'.$o['opId'].'</td>';
                     $date = date_create($o['opFecha']);                    
                     echo '<td style="text-align: center">'.date_format($date, 'd-m-Y H:i').'</td>';
+                    echo '<td style="text-align: right">'.number_format($o['total'],2,',','.').'</td>';
                     echo '<td style="text-align: center">';
                     switch ($o['opEstado'])
                     {
@@ -187,7 +201,10 @@ $('#btnFacturar').click(function(){
     WaitingOpen('Confeccionando Factura...');
       $.ajax({
             type: 'POST',
-            data: { list : remitosParaFacturar, cliId : cliId_ },
+            data: { 
+                    list : remitosParaFacturar, 
+                    cliId : cliId_ 
+                  },
             url: 'index.php/box/getFactura', 
             success: function(result){
                             WaitingClose();
@@ -239,5 +256,57 @@ function PrintRemito(id__){
           },
           dataType: 'json'
       });
+}
+
+function LoadPago(id){
+  WaitingOpen('Consultando Pago...');
+   $.ajax({
+           type: 'POST',
+           data: { 
+                   opId: id
+                 },
+       url: 'index.php/box/getPago', 
+       success: function(result){
+                     if(result){
+                       $('#modalBodyView').html(result.html);
+                       $('#modalPagosView').modal('show');
+                       WaitingClose();
+                     } else {
+                       WaitingClose();
+                       ProcesarError(result.responseText, 'modalPagosView');      
+                     }
+             },
+       error: function(result){
+             WaitingClose();
+              ProcesarError(result.responseText, 'modalPagosView');   
+           },
+           dataType: 'json'
+       });
+}
+
+function LoadFactura(id){
+  WaitingOpen('Consultando Factura...');
+   $.ajax({
+           type: 'POST',
+           data: { 
+                   cvId: id
+                 },
+       url: 'index.php/box/getFactura_', 
+       success: function(result){
+                     if(result){
+                       $('#modalBodyFacturaView').html(result.html);
+                       $('#modalFacturaView').modal('show');
+                       WaitingClose();
+                     } else {
+                       WaitingClose();
+                       ProcesarError(result.responseText, 'modalFacturaView');      
+                     }
+             },
+       error: function(result){
+             WaitingClose();
+              ProcesarError(result.responseText, 'modalFacturaView');   
+           },
+           dataType: 'json'
+       });
 }
 </script>

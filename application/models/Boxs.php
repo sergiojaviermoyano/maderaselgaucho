@@ -40,17 +40,35 @@ class Boxs extends CI_Model
 			$data = array();
 
 			//Orden de Trabajo
+			if($type == 'BL'){ //+ (b.artPrecio * (d.ivaPorcent / 100))
 			$query = $this->db->query('
-				Select * 
-				From ordendetrabajo
-				Join remito On remito.ordId = ordendetrabajo.ordId 
-				Where cliId = '.$cliId.' 
-				Order by remFecha desc');
+			Select r.*,
+				(select sum((od.artPrecio * rd.remdCantidad) * 1.21) 
+				from remitodetalle as rd 
+				join ordendetrabajodetalle as od on od.orddId = rd.orddId 
+				where rd.remId = r.remId) as total
+			From remito as r
+			Join ordendetrabajo as o On o.ordId = r.ordId 
+			Where o.cliId = '.$cliId.'
+			Order by r.remFecha desc');
+			} else {
+				$query = $this->db->query('
+				Select r.*,
+					(select sum(od.artPrecio * rd.remdCantidad) 
+					from remitodetalle as rd 
+					join ordendetrabajodetalle as od on od.orddId = rd.orddId 
+					where rd.remId = r.remId) as total
+				From remito as r
+				Join ordendetrabajo as o On o.ordId = r.ordId 
+				Where o.cliId = '.$cliId.'
+				Order by r.remFecha desc');
+			}
 			$data['remitos'] = $query->result_array();
 
 			//Facturas
 			$query = $this->db->query('
-				Select cv.*,  tl.descTalonario
+				Select cv.*,  tl.descTalonario,
+				(select sum((a.cvdCantidad * a.cvdPrecio) * 1.21) from cventadetalle as a where a.cvId = cv.cvId) as total
 				From cventa as cv
 				Join talonarios as tl On tl.idTalonario = cv.idTalonario 
 				Where cliId = '.$cliId.' 
@@ -62,10 +80,10 @@ class Boxs extends CI_Model
 
 			//Ordenes de Pago
 			$query = $this->db->query('
-				Select *
-				From opago
-				Where cliId = '.$cliId.' 
-				Order by opFecha desc');
+				Select a.*, (select sum(opImportePago) from opagodetalle as b where b.opId = a.opId ) as total
+				From opago as a
+				Where a.cliId = '.$cliId.' 
+				Order by a.opFecha desc');
 			$data['ordenes'] = $query->result_array();
 
 			//Bancos
@@ -165,6 +183,7 @@ class Boxs extends CI_Model
 		{
 			$list 	= $data['list'];
 			$cliId  = $data['cliId'];
+			$fecha  = $data['fecha'];
 			
 			$info = $this->getFactura($data);
 			$data = array();
@@ -177,6 +196,10 @@ class Boxs extends CI_Model
 				'cliId'			=> $cliId,
 				'cvRazonSocial' => $info['cliente']['cliApellido'].', '.$info['cliente']['cliNombre']
 			);
+			if($fecha != ''){
+				$fecha = explode('-',$fecha);
+				$factura['cvFecha'] = $fecha[2].'-'.$fecha[1].'-'.$fecha[0].' 01:00:00'; 
+			}
 
 			//Obtener numero de talonario 
 			$query = $this->db->get_where('fiscal', array('fisId' => $info['cliente']['fisId']));
@@ -326,12 +349,18 @@ class Boxs extends CI_Model
 			$obsv	= $data['obsv'];
 			$efect	= $data['efect'];
             $cheq	= isset($data['cheq']) ? $data['cheq'] : array();
+			$fecha 	= $data['fecha'];
 
 			$data = array(
 					'cliId'			=> $cliId,
 					'opObservacion' => $obsv, 
 					'opType'	=> $type
 				);
+				
+			if($fecha != ''){
+				$fecha = explode('-',$fecha);
+				$data['opFecha'] = $fecha[2].'-'.$fecha[1].'-'.$fecha[0].' 01:00:00'; 
+			}
 
 			$this->db->trans_begin();
 
@@ -406,5 +435,65 @@ class Boxs extends CI_Model
 		return true;
 	}
 
+	function getPago($data){
+		if($data == null)
+		{
+			return false;
+		}
+		else
+		{
+			$oPago = array();
+			$opId = $data['opId'];
+			$this->db->select('*');
+			$this->db->from('opago');
+			$this->db->where(array('opId' => $opId));
+			$query = $this->db->get();
+			
+			$orden = $query->result_array();
+			$oPago['orden'] = $orden[0];
+
+			$this->db->select('*')
+			->from('opagodetalle')
+			->join('cheques', 'cheques.cheId = opagodetalle.chequeId', 'left')
+			->join('bancos', 'bancos.bancoId = cheques.bancoId', 'left')
+			->where(array('opId' => $opId));
+			$query = $this->db->get();
+		
+			$oPago['ordenDetalle'] = $query->result_array();
+			
+			return $oPago;
+			//var_dump($oPago);
+		}
+	}
+
+	function getFactura_($data){
+		if($data == null)
+		{
+			return false;
+		}
+		else
+		{
+			$cventa = array();
+			$cvId = $data['cvId'];
+			$this->db->select('cventa.*, talonarios.descTalonario')
+			->from('cventa')
+			->join('talonarios', 'talonarios.idTalonario = cventa.idTalonario ')
+			->where(array('cvId' => $cvId));
+			$query = $this->db->get();
+			
+			$comprobante = $query->result_array();
+			$cventa['comprobante'] = $comprobante[0];
+
+			$this->db->select('*')
+			->from('cventadetalle')
+			->where(array('cvId' => $cvId));
+			$query = $this->db->get();
+		
+			$cventa['detalle'] = $query->result_array();
+			
+			return $cventa;
+			//var_dump($oPago);
+		}
+	}
 }
 ?>

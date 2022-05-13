@@ -57,5 +57,20 @@ class box extends CI_Controller {
 			echo json_encode(true);	
 		}
 	}
+
+	function getPago(){
+		$data['data'] = $this->Boxs->getPago($this->input->post());
+		$response['html'] = $this->load->view('boxs/pago_', $data, true);
+
+		echo json_encode($response);
+		//echo json_encode(true);
+	}
 	
+	function getFactura_(){
+		$data['data'] = $this->Boxs->getFactura_($this->input->post());
+		$response['html'] = $this->load->view('boxs/facturaview_', $data, true);
+
+		echo json_encode($response);
+		//echo json_encode(true);
+	}
 }

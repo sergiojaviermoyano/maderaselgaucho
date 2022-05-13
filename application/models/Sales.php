@@ -39,7 +39,7 @@ class Sales extends CI_Model
 
 			//Facturas
 			$query = $this->db->query('
-				Select cc.*
+				Select cc.*, (select sum(cd.ccdCantidad * cd.ccdPrecio) from ccompradetalle as cd where cd.ccId = cc.ccId) as total
 				From ccompra as cc
 				Where prvId = '.$prvId.' 
 				Order by cc.ccFecha desc');
@@ -47,8 +47,8 @@ class Sales extends CI_Model
 			
 			//Ordenes de Pago
 			$query = $this->db->query('
-				Select *
-				From opagoc
+				Select op.*, (select sum(opd.opImportePago) from opagocdetalle as opd where opd.opId = op.opId) as total 
+				From opagoc as op
 				Where prvId = '.$prvId.' 
 				Order by opFecha desc');
 			$data['ordenes'] = $query->result_array();
@@ -129,6 +129,7 @@ class Sales extends CI_Model
 			$prvId  = $data['prvId'];
 			$tipo 	= $data['tipo'];
 			$nro 	= $data['nro'];
+			$fecha	= $data['fecha'];
 			
 			$data = array();
 
@@ -145,6 +146,11 @@ class Sales extends CI_Model
 				'prvId'			=> $prvId,
 				'ccRazonSocial' => $proveedor['prvRazonSocial']
 			);
+
+			if($fecha != ''){
+				$fecha = explode('-',$fecha);
+				$factura['ccFecha'] = $fecha[2].'-'.$fecha[1].'-'.$fecha[0].' 02:00:00'; 
+			}
 
 			//Insertar cabecera
 			if($this->db->insert('ccompra', $factura) == false) {
@@ -252,11 +258,17 @@ class Sales extends CI_Model
 			$obsv	= $data['obsv'];
 			$efect	= $data['efect'];
             $cheq	= isset($data['cheq']) ? $data['cheq'] : array();
+			$fecha	= $data['fecha'];
 
 			$data = array(
 					'prvId'			=> $prvId,
 					'opObservacion' => $obsv
 				);
+
+			if($fecha != ''){
+				$fecha = explode('-',$fecha);
+				$data['opFecha'] = $fecha[2].'-'.$fecha[1].'-'.$fecha[0].' 02:00:00'; 
+			}
 
 			$this->db->trans_begin();
 
@@ -354,6 +366,65 @@ class Sales extends CI_Model
 		}
 
 		return true;
+	}
+
+	function getFactura_($data){
+		if($data == null)
+		{
+			return false;
+		}
+		else
+		{
+			$ccompra = array();
+			$ccId = $data['ccId'];
+			$this->db->select('ccompra.*')
+			->from('ccompra')
+			->where(array('ccId' => $ccId));
+			$query = $this->db->get();
+			
+			$comprobante = $query->result_array();
+			$ccompra['comprobante'] = $comprobante[0];
+
+			$this->db->select('*')
+			->from('ccompradetalle')
+			->where(array('ccId' => $ccId));
+			$query = $this->db->get();
+		
+			$ccompra['detalle'] = $query->result_array();
+			
+			return $ccompra;
+		}
+	}
+
+	function getPago($data){
+		if($data == null)
+		{
+			return false;
+		}
+		else
+		{
+			$oPago = array();
+			$opId = $data['opId'];
+			$this->db->select('*');
+			$this->db->from('opagoc');
+			$this->db->where(array('opId' => $opId));
+			$query = $this->db->get();
+			
+			$orden = $query->result_array();
+			$oPago['orden'] = $orden[0];
+
+			$this->db->select('*')
+			->from('opagocdetalle')
+			->join('cheques', 'cheques.cheId = opagocdetalle.chequeId', 'left')
+			->join('bancos', 'bancos.bancoId = cheques.bancoId', 'left')
+			->where(array('opId' => $opId));
+			$query = $this->db->get();
+		
+			$oPago['ordenDetalle'] = $query->result_array();
+			
+			return $oPago;
+			//var_dump($oPago);
+		}
 	}
 }
 ?>
