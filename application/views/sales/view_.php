@@ -1,3 +1,4 @@
+<input type="hidden" value="<?php echo $data['prvId'];?>" id="prvId">
 <div class="row">
 	<div class="col-xs-12">
 		<div class="alert alert-danger alert-dismissable" id="error" style="display: none">
@@ -140,12 +141,48 @@
     </div>
 
     <div class="tab-pane" id="tab_5">
-                Consultas
+      <input type="text" class="btn btn-default" id="fromDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">  
+      <input type="text" class="btn btn-default" id="toDate" value="" placeholder="dd-mm-aaaa" readonly="readonly" style="width: 110px">
+      <button type="button" class="btn btn-primary" id="btnConsultar">Consultar</button>
+      <hr>
+              <div id="estadoCuenta">
+
+              </div>
     </div>
   </div>
 </div>
 
 <script>
+  $('#fromDate').datepicker({maxDate: 0});
+  $('#toDate').datepicker({maxDate: 0});
+  $('#btnConsultar').click(function(){
+    //estadoCuenta
+    if($('#fromDate').val() == '' || $('#toDate').val() == ''){
+      return;
+    }  
+    $("#estadoCuenta").html('');
+
+    WaitingOpen('Consultando...');
+    $.ajax({
+          type: 'POST',
+          data: { 
+                  prvId : $('#prvId').val(),
+                  from  : $('#fromDate').val(),
+                  to    : $('#toDate').val()
+                },
+          url: 'index.php/sale/getExtracto', 
+          success: function(result){
+                          WaitingClose();
+                          $("#estadoCuenta").html(result.html);
+                      },
+          error: function(result){
+                      WaitingClose();
+                      ProcesarError(result.responseText, 'modal');
+                  },
+          dataType: 'json'
+          });
+  });
+
 $('#btnFacturar').click(function(){
     if(remitosParaFacturar.length <= 0){
         return ; 

@@ -36,6 +36,7 @@ class Sales extends CI_Model
 			$prvId 	= $data['prvId'];
 
 			$data = array();
+			$data['prvId'] = $prvId;
 
 			//Facturas
 			$query = $this->db->query('
@@ -425,6 +426,71 @@ class Sales extends CI_Model
 			return $oPago;
 			//var_dump($oPago);
 		}
+	}
+
+	function calcularExtracto($data){
+		$prvId 	= $data['prvId']; 
+		$desde	= $data['from'];
+		$hasta	= $data['to'];
+
+		$desde = explode('-',$desde);
+		$desde = $desde[2].'-'.$desde[1].'-'.$desde[0].' 00:00:00'; 
+
+		$hasta = explode('-',$hasta);
+		$hasta = $hasta[2].'-'.$hasta[1].'-'.$hasta[0].' 23:59:59'; 
+		//Calcular el saldo
+		$data= array();
+		//Saldo debe
+		//Facturas
+		$query = $this->db->query('
+		Select (select sum(cd.ccdCantidad * cd.ccdPrecio) from ccompradetalle as cd where cd.ccId = cc.ccId) as total
+			From ccompra as cc
+			Where prvId = '.$prvId.' and cc.ccFecha < \''.$desde.'\' ');
+
+		$data['saldoDebe'] = 0;
+		foreach($query->result_array() as $item){
+			$data['saldoDebe'] += $item['total'];
+
+		}
+	
+		//Saldo haber
+		$query = $this->db->query('
+				Select (select sum(opd.opImportePago) from opagocdetalle as opd where opd.opId = op.opId) as total 
+				From opagoc as op
+				Where prvId = '.$prvId.'  and op.opFecha < \''.$desde.'\' ');
+
+		$data['saldoHaber'] = 0;
+		foreach($query->result_array() as $item){
+			$data['saldoHaber'] += $item['total'];
+		}
+
+		
+		//---------------------------------------------------------------------------------------
+		$query1 = '
+				Select 
+					cc.ccNumero as id, 
+					cc.ccTipo as tipoComp, 
+					(select sum(cd.ccdCantidad * cd.ccdPrecio) from ccompradetalle as cd where cd.ccId = cc.ccId) as total,
+					cc.ccFecha as fecha,
+					1 as tipo
+				From ccompra as cc
+				Where prvId = '.$prvId.' and cc.ccFecha between \''.$desde.'\' and \''.$hasta.'\' ';
+		
+		$query2 = '
+				Select 
+					op.opId as id,
+					1 as tipoComp, 
+					(select sum(opd.opImportePago) from opagocdetalle as opd where opd.opId = op.opId) as total,
+					opFecha as fecha,
+					0 as tipo 
+				From opagoc as op
+				Where prvId = '.$prvId.' and opFecha between \''.$desde.'\' and \''.$hasta.'\' ';
+	
+		$query = $this->db->query('( ' .$query1. ' ) union (' .$query2 .' ) order by fecha asc ');
+		$data['debe'] = $query->result_array();
+		//---------------------------------------------------------------------------------------
+
+		return $data;
 	}
 }
 ?>

@@ -27,6 +27,13 @@ class sale extends CI_Controller {
 		echo json_encode($response);
 	}
 
+	function getExtracto(){
+		$data['data'] = $this->Sales->calcularExtracto($this->input->post());
+		$response['html'] = $this->load->view('sales/extracto_', $data, true);
+
+		echo json_encode($response);
+	}
+
 	public function loadFactura(){
 		$data['data'] = $this->Sales->loadFactura($this->input->post());
 		$response['html'] = $this->load->view('sales/factura', $data, true);

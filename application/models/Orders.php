@@ -248,7 +248,7 @@ class Orders extends CI_Model
 	        $oc 	= $data['OC'];
 	        $est 	= $data['est'];
 	        $det 	= isset($data['det']) ? $data['det'] : array();
-			$fecha 	= $data['fecha'];
+			$fecha 	= isset($data['fecha']) ? $data['fecha'] : '';
 			
 			$data = array(
 					   'cliId'		 	=> $cliId,
